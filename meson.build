@@ -9,12 +9,14 @@ src_root = meson.source_root()
 # ---------------------------------------------------------------------------
 # Common compile flags / defines
 # ---------------------------------------------------------------------------
+playground = src_root / 'playground'
+
 nh_defs = [
   '-DDLB',
-  '-DHACKDIR="/tmp/nethack"',
+  '-DHACKDIR="' + playground + '"',
   '-DDEFAULT_WINDOW_SYS="tty"',
   '-DSYSCF',
-  '-DSYSCF_FILE="/tmp/nethack/sysconf"',
+  '-DSYSCF_FILE="' + playground + '/sysconf"',
   '-DSECURE',
   '-DTIMED_DELAY',
   '-DDUMPLOG',
