@@ -14,7 +14,7 @@ playground = src_root / 'playground'
 nh_defs = [
   '-DDLB',
   '-DHACKDIR="' + playground + '"',
-  '-DDEFAULT_WINDOW_SYS="tty"',
+  '-DDEFAULT_WINDOW_SYS="hack2bridge"',
   '-DSYSCF',
   '-DSYSCF_FILE="' + playground + '/sysconf"',
   '-DSECURE',
@@ -27,12 +27,14 @@ nh_defs = [
   '-DSIG_RET_TYPE=__sighandler_t',
   '-DNOSTATICFN',
   '-DWANT_WIN_TTY',
+  '-DHACK2BRIDGE_GRAPHICS',
 ]
 
 lua_defs = ['-DLUA_USE_LINUX']
 
-inc_nh   = include_directories('include')
-inc_lua  = include_directories('submodules/lua')
+inc_nh        = include_directories('include')
+inc_lua       = include_directories('submodules/lua')
+inc_hack2b    = include_directories('win/hack2bridge')
 
 # ---------------------------------------------------------------------------
 # Generate include/nhlua.h  (wraps Lua headers, adds NORETURN to lua_error)
@@ -301,6 +303,8 @@ core_sources = files(
   'win/tty/termcap.c',
   'win/tty/topl.c',
   'win/tty/wintty.c',
+  # hack2bridge window port
+  'win/hack2bridge/hack2bridge.c',
   # regex
   'sys/share/posixregex.c',
 )
@@ -318,7 +322,7 @@ nethack_exe = executable('nethack',
   # build-order dependency.
   [core_sources, gen_nhlua, gen_onames, gen_pm],
   c_args : nh_defs,
-  include_directories : [inc_nh, inc_lua],
+  include_directories : [inc_nh, inc_lua, inc_hack2b],
   link_with : [libhacklib, liblua],
   dependencies : [dep_m, dep_dl, dep_ncurses],
   link_args : ['-rdynamic'],

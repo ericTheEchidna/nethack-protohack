@@ -45,6 +45,9 @@ extern struct window_procs mswin_procs;
 #ifdef SHIM_GRAPHICS
 extern struct window_procs shim_procs;
 #endif
+#ifdef HACK2BRIDGE_GRAPHICS
+#include "hack2bridge.h"
+#endif
 #ifdef WINCHAIN
 extern struct window_procs chainin_procs;
 extern void chainin_procs_init(int);
@@ -125,6 +128,9 @@ static struct win_choices {
 #endif
 #ifdef GNOME_GRAPHICS
     { &Gnome_procs, 0 CHAINR(0) },
+#endif
+#ifdef HACK2BRIDGE_GRAPHICS
+    { &hack2bridge_procs, 0 CHAINR(0) },
 #endif
 #ifdef MSWIN_GRAPHICS
     { &mswin_procs, 0 CHAINR(0) },
