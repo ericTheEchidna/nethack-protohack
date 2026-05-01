@@ -329,6 +329,7 @@ void
 hack2b_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 {
     iflags.window_inited = TRUE;
+    iflags.perm_invent = TRUE; /* request inventory updates at moveloop start and after every change */
     fprintf(stdout,
             "< engine.hello version=%d caps=\"status_update inv_structured\"\n",
             HACK2B_PROTOCOL_VERSION);
