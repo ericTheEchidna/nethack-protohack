@@ -160,6 +160,40 @@ gen_pm = custom_target('pm_h',
 )
 
 # ---------------------------------------------------------------------------
+# tilemap executable — generates src/tile.c (glyph→tile index table)
+#
+# Follows the same "run from source tree, copy to build dir" pattern as
+# makedefs.  tilemap writes to ../src/tile.c relative to its CWD; we run it
+# from win/share/ so that resolves to src/tile.c in the source tree, then
+# copy the result to the build dir for Meson tracking.
+# ---------------------------------------------------------------------------
+tilemap_sources = files(
+  'win/share/tilemap.c',
+  'src/monst.c',
+  'src/objects.c',
+  'src/drawing.c',
+)
+
+tilemap_exe = executable('tilemap',
+  [tilemap_sources, gen_nhlua, gen_onames, gen_pm],
+  c_args : nh_defs,
+  include_directories : [inc_nh, inc_lua],
+  link_with : [libhacklib, liblua],
+  link_args : ['-lm', '-ldl', '-rdynamic'],
+)
+
+gen_tile_c = custom_target('tile_c',
+  output  : 'tile.c',
+  input   : [],
+  command : [
+    'sh', '-c',
+    'cd "$0/util" && "$1" && cp "$0/src/tile.c" "$2/tile.c"',
+    src_root, tilemap_exe, meson.current_build_dir(),
+  ],
+  build_by_default : true,
+)
+
+# ---------------------------------------------------------------------------
 # Core nethack sources  (HOBJ list minus hacklib.c, which is in the lib)
 # ---------------------------------------------------------------------------
 core_sources = files(
@@ -317,11 +351,10 @@ dep_dl      = cc.find_library('dl')
 dep_ncurses = cc.find_library('ncurses')
 
 nethack_exe = executable('nethack',
-  # Include generated headers as sources so Meson builds them first.
-  # They are not compiled (they're .h files) but this establishes the
-  # build-order dependency.
-  [core_sources, gen_nhlua, gen_onames, gen_pm],
-  c_args : nh_defs,
+  # gen_nhlua/gen_onames/gen_pm are .h files — listed for build-order only.
+  # gen_tile_c is a generated .c file and is actually compiled in.
+  [core_sources, gen_nhlua, gen_onames, gen_pm, gen_tile_c],
+  c_args : nh_defs + ['-DTILES_IN_GLYPHMAP'],
   include_directories : [inc_nh, inc_lua, inc_hack2b],
   link_with : [libhacklib, liblua],
   dependencies : [dep_m, dep_dl, dep_ncurses],
